@@ -2003,14 +2003,21 @@ Phase 1 – Woche 1 (13.–19. April): Fundamente
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cGh2c2N3ZXBrbnRyY3dpbHdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MDcwNjcsImV4cCI6MjA5MTA4MzA2N30.7hf09_s8WA5XLNX9jPCjdFKDAB9-pPXSxmFkCdyCeo4';
     const APP_PASSWORD = '2304';
     
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    
+    let supabaseClient = null;
     let syncTimeout = null;
     let isInitialLoad = true;
+
+    function getSupabase() {
+      if (!supabaseClient && window.supabase) {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      }
+      return supabaseClient;
+    }
 
     function showSyncIndicator(status, text) {
       const indicator = document.getElementById('sync-indicator');
       const textEl = document.getElementById('sync-text');
+      if (!indicator || !textEl) return;
       indicator.className = 'sync-indicator visible ' + status;
       textEl.textContent = text;
       
@@ -2024,6 +2031,9 @@ Phase 1 – Woche 1 (13.–19. April): Fundamente
     async function syncToSupabase() {
       if (isInitialLoad) return;
       
+      const sb = getSupabase();
+      if (!sb) return;
+      
       showSyncIndicator('syncing', 'Synchronisiere...');
       
       try {
@@ -2035,7 +2045,7 @@ Phase 1 – Woche 1 (13.–19. April): Fundamente
           updated_at: new Date().toISOString()
         };
         
-        const { error } = await supabase
+        const { error } = await sb
           .from('zp10_data')
           .upsert(data, { onConflict: 'id' });
         
@@ -2054,8 +2064,11 @@ Phase 1 – Woche 1 (13.–19. April): Fundamente
     }
 
     async function loadFromSupabase() {
+      const sb = getSupabase();
+      if (!sb) return false;
+      
       try {
-        const { data, error } = await supabase
+        const { data, error } = await sb
           .from('zp10_data')
           .select('*')
           .eq('id', 'erik_data')
@@ -2124,17 +2137,22 @@ Phase 1 – Woche 1 (13.–19. April): Fundamente
     // ============================================
     
     function checkPassword() {
-      const input = document.getElementById('lock-input').value;
-      const errorEl = document.getElementById('lock-error');
-      
-      if (input === APP_PASSWORD) {
-        sessionStorage.setItem('zp10_unlocked', 'true');
-        document.getElementById('lock-screen').style.display = 'none';
-        initApp();
-      } else {
-        errorEl.classList.add('visible');
-        document.getElementById('lock-input').value = '';
-        setTimeout(() => errorEl.classList.remove('visible'), 2000);
+      try {
+        const input = document.getElementById('lock-input').value;
+        const errorEl = document.getElementById('lock-error');
+        
+        if (input === APP_PASSWORD) {
+          sessionStorage.setItem('zp10_unlocked', 'true');
+          document.getElementById('lock-screen').style.display = 'none';
+          initApp();
+        } else {
+          errorEl.classList.add('visible');
+          document.getElementById('lock-input').value = '';
+          setTimeout(() => errorEl.classList.remove('visible'), 2000);
+        }
+      } catch (err) {
+        console.error('Password check error:', err);
+        alert('Fehler: ' + err.message);
       }
     }
 
@@ -2153,10 +2171,16 @@ Phase 1 – Woche 1 (13.–19. April): Fundamente
     });
 
     async function initApp() {
-      showSyncIndicator('syncing', 'Lade Daten...');
-      await loadFromSupabase();
-      isInitialLoad = false;
-      showSyncIndicator('synced', 'Geladen ✓');
+      try {
+        showSyncIndicator('syncing', 'Lade Daten...');
+        await loadFromSupabase();
+        isInitialLoad = false;
+        showSyncIndicator('synced', 'Geladen ✓');
+      } catch (err) {
+        console.error('Init error:', err);
+        isInitialLoad = false;
+        showSyncIndicator('error', 'Offline-Modus');
+      }
       
       // Continue with normal initialization
       const config = getConfig();
