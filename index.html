@@ -2073,18 +2073,35 @@ Phase 1 – Woche 1 (13.–19. April): Fundamente
       
       const sb = getSupabase();
       if (!sb) {
-        console.warn('Supabase not available');
+        console.warn('Supabase not available after 2 seconds');
+        showSyncIndicator('error', 'Supabase nicht verfügbar');
         return false;
       }
       
       try {
+        console.log('Fetching from Supabase...');
         const { data, error } = await sb
           .from('zp10_data')
           .select('*')
           .eq('id', 'erik_data')
           .single();
         
-        if (error && error.code !== 'PGRST116') throw error;
+        console.log('Supabase response:', { data, error });
+        
+        if (error) {
+          if (error.code === 'PGRST116') {
+            // No rows found - this is OK for first sync
+            console.log('No data in Supabase yet');
+            return false;
+          }
+          if (error.code === '42P01') {
+            // Table doesn't exist
+            console.error('Table zp10_data does not exist! Please create it in Supabase.');
+            showSyncIndicator('error', 'Tabelle fehlt in Supabase');
+            return false;
+          }
+          throw error;
+        }
         
         if (data) {
           console.log('Loaded from Supabase:', data);
@@ -2096,6 +2113,7 @@ Phase 1 – Woche 1 (13.–19. April): Fundamente
         return false;
       } catch (err) {
         console.error('Load error:', err);
+        showSyncIndicator('error', err.message || 'Lade-Fehler');
         return false;
       }
     }
@@ -2182,19 +2200,28 @@ Phase 1 – Woche 1 (13.–19. April): Fundamente
     });
 
     async function initApp() {
+      let syncSuccess = false;
+      
       try {
         showSyncIndicator('syncing', 'Lade Daten...');
-        await loadFromSupabase();
+        syncSuccess = await loadFromSupabase();
         isInitialLoad = false;
-        showSyncIndicator('synced', 'Geladen ✓');
+        
+        if (syncSuccess) {
+          showSyncIndicator('synced', 'Geladen ✓');
+        } else {
+          showSyncIndicator('error', 'Keine Daten gefunden');
+        }
       } catch (err) {
         console.error('Init error:', err);
         isInitialLoad = false;
-        showSyncIndicator('error', 'Offline-Modus');
+        showSyncIndicator('error', 'Sync-Fehler: ' + err.message);
       }
       
       // Continue with normal initialization
       const config = getConfig();
+      console.log('Config after sync:', config);
+      
       if (config.theme === 'light') {
         document.documentElement.setAttribute('data-theme', 'light');
       }
