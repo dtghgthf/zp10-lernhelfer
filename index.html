@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ZP10 Lernhelfer</title>
   <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     /* ============================================
        DESIGN SYSTEM - Anthropic-inspired
@@ -1452,9 +1453,135 @@
     .hidden {
       display: none !important;
     }
+
+    /* Password Lock Screen */
+    .lock-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--color-bg);
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-xl);
+    }
+
+    .lock-container {
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .lock-icon {
+      font-size: 4rem;
+      margin-bottom: var(--space-lg);
+    }
+
+    .lock-title {
+      font-size: 1.5rem;
+      margin-bottom: var(--space-sm);
+    }
+
+    .lock-subtitle {
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-xl);
+    }
+
+    .lock-input {
+      width: 100%;
+      padding: var(--space-md);
+      font-size: 1.5rem;
+      text-align: center;
+      letter-spacing: 0.5em;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      color: var(--color-text);
+      margin-bottom: var(--space-md);
+    }
+
+    .lock-input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+
+    .lock-error {
+      color: var(--color-error);
+      font-size: 0.875rem;
+      margin-bottom: var(--space-md);
+      display: none;
+    }
+
+    .lock-error.visible {
+      display: block;
+    }
+
+    /* Sync indicator */
+    .sync-indicator {
+      position: fixed;
+      top: var(--space-md);
+      right: var(--space-md);
+      padding: var(--space-xs) var(--space-sm);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      opacity: 0;
+      transition: opacity var(--transition-base);
+    }
+
+    .sync-indicator.visible {
+      opacity: 1;
+    }
+
+    .sync-indicator.syncing {
+      color: var(--color-warning);
+    }
+
+    .sync-indicator.synced {
+      color: var(--color-success);
+    }
+
+    .sync-indicator.error {
+      color: var(--color-error);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .sync-indicator.syncing::before {
+      content: '↻';
+      animation: spin 1s linear infinite;
+    }
   </style>
 </head>
 <body>
+  <!-- Lock Screen -->
+  <div class="lock-screen" id="lock-screen">
+    <div class="lock-container">
+      <div class="lock-icon">🔒</div>
+      <h1 class="lock-title">ZP10 Lernhelfer</h1>
+      <p class="lock-subtitle">Bitte PIN eingeben</p>
+      <input type="password" class="lock-input" id="lock-input" maxlength="10" placeholder="••••" autofocus>
+      <p class="lock-error" id="lock-error">Falsches Passwort</p>
+      <button class="btn btn-primary" style="width: 100%;" onclick="checkPassword()">Entsperren</button>
+    </div>
+  </div>
+
+  <!-- Sync Indicator -->
+  <div class="sync-indicator" id="sync-indicator">
+    <span id="sync-text">Synchronisiert</span>
+  </div>
+
   <!-- Onboarding Overlay -->
   <div class="onboarding-overlay" id="onboarding">
     <div class="onboarding-container">
@@ -1869,8 +1996,85 @@ Phase 1 – Woche 1 (13.–19. April): Fundamente
     }
 
     // ============================================
-    // DATA MANAGEMENT
+    // DATA MANAGEMENT WITH SUPABASE SYNC
     // ============================================
+    
+    const SUPABASE_URL = 'https://byphvscwepkntrcwilwb.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cGh2c2N3ZXBrbnRyY3dpbHdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MDcwNjcsImV4cCI6MjA5MTA4MzA2N30.7hf09_s8WA5XLNX9jPCjdFKDAB9-pPXSxmFkCdyCeo4';
+    const APP_PASSWORD = '2304';
+    
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    let syncTimeout = null;
+    let isInitialLoad = true;
+
+    function showSyncIndicator(status, text) {
+      const indicator = document.getElementById('sync-indicator');
+      const textEl = document.getElementById('sync-text');
+      indicator.className = 'sync-indicator visible ' + status;
+      textEl.textContent = text;
+      
+      if (status !== 'syncing') {
+        setTimeout(() => {
+          indicator.classList.remove('visible');
+        }, 2000);
+      }
+    }
+
+    async function syncToSupabase() {
+      if (isInitialLoad) return;
+      
+      showSyncIndicator('syncing', 'Synchronisiere...');
+      
+      try {
+        const data = {
+          id: 'erik_data',
+          config: JSON.parse(localStorage.getItem('zp10_config') || '{}'),
+          events: JSON.parse(localStorage.getItem('zp10_events') || '[]'),
+          logs: JSON.parse(localStorage.getItem('zp10_logs') || '[]'),
+          updated_at: new Date().toISOString()
+        };
+        
+        const { error } = await supabase
+          .from('zp10_data')
+          .upsert(data, { onConflict: 'id' });
+        
+        if (error) throw error;
+        
+        showSyncIndicator('synced', 'Synchronisiert ✓');
+      } catch (err) {
+        console.error('Sync error:', err);
+        showSyncIndicator('error', 'Sync-Fehler');
+      }
+    }
+
+    function debouncedSync() {
+      if (syncTimeout) clearTimeout(syncTimeout);
+      syncTimeout = setTimeout(syncToSupabase, 1000);
+    }
+
+    async function loadFromSupabase() {
+      try {
+        const { data, error } = await supabase
+          .from('zp10_data')
+          .select('*')
+          .eq('id', 'erik_data')
+          .single();
+        
+        if (error && error.code !== 'PGRST116') throw error;
+        
+        if (data) {
+          if (data.config) localStorage.setItem('zp10_config', JSON.stringify(data.config));
+          if (data.events) localStorage.setItem('zp10_events', JSON.stringify(data.events));
+          if (data.logs) localStorage.setItem('zp10_logs', JSON.stringify(data.logs));
+          return true;
+        }
+        return false;
+      } catch (err) {
+        console.error('Load error:', err);
+        return false;
+      }
+    }
     
     function getConfig() {
       const config = localStorage.getItem('zp10_config');
@@ -1879,6 +2083,7 @@ Phase 1 – Woche 1 (13.–19. April): Fundamente
     
     function saveConfig(config) {
       localStorage.setItem('zp10_config', JSON.stringify(config));
+      debouncedSync();
     }
     
     function getEvents() {
@@ -1888,6 +2093,7 @@ Phase 1 – Woche 1 (13.–19. April): Fundamente
     
     function saveEvents(events) {
       localStorage.setItem('zp10_events', JSON.stringify(events));
+      debouncedSync();
     }
     
     function getLogs() {
@@ -1897,6 +2103,7 @@ Phase 1 – Woche 1 (13.–19. April): Fundamente
     
     function saveLogs(logs) {
       localStorage.setItem('zp10_logs', JSON.stringify(logs));
+      debouncedSync();
     }
     
     function getEventById(id) {
@@ -1909,6 +2116,59 @@ Phase 1 – Woche 1 (13.–19. April): Fundamente
       if (index !== -1) {
         events[index] = { ...events[index], ...updates };
         saveEvents(events);
+      }
+    }
+
+    // ============================================
+    // PASSWORD PROTECTION
+    // ============================================
+    
+    function checkPassword() {
+      const input = document.getElementById('lock-input').value;
+      const errorEl = document.getElementById('lock-error');
+      
+      if (input === APP_PASSWORD) {
+        sessionStorage.setItem('zp10_unlocked', 'true');
+        document.getElementById('lock-screen').style.display = 'none';
+        initApp();
+      } else {
+        errorEl.classList.add('visible');
+        document.getElementById('lock-input').value = '';
+        setTimeout(() => errorEl.classList.remove('visible'), 2000);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const lockInput = document.getElementById('lock-input');
+      if (lockInput) {
+        lockInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') checkPassword();
+        });
+      }
+      
+      if (sessionStorage.getItem('zp10_unlocked') === 'true') {
+        document.getElementById('lock-screen').style.display = 'none';
+        initApp();
+      }
+    });
+
+    async function initApp() {
+      showSyncIndicator('syncing', 'Lade Daten...');
+      await loadFromSupabase();
+      isInitialLoad = false;
+      showSyncIndicator('synced', 'Geladen ✓');
+      
+      // Continue with normal initialization
+      const config = getConfig();
+      if (config.theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+      
+      if (!config.setupDone) {
+        document.getElementById('onboarding').style.display = 'flex';
+      } else {
+        document.getElementById('onboarding').style.display = 'none';
+        initializeApp();
       }
     }
 
@@ -2840,7 +3100,7 @@ ${planText}`;
     // INITIALIZATION
     // ============================================
     
-    function initApp() {
+    function initializeApp() {
       applyTheme();
       renderDashboard();
       renderCalendar();
@@ -2848,16 +3108,7 @@ ${planText}`;
       loadSettings();
     }
     
-    // Check if onboarding is needed
-    document.addEventListener('DOMContentLoaded', () => {
-      const config = getConfig();
-      
-      if (config.setupDone) {
-        document.getElementById('onboarding').style.display = 'none';
-        document.getElementById('app').style.display = 'flex';
-        initApp();
-      }
-    });
+    // Password-protected initialization is handled above
   </script>
 </body>
 </html>
