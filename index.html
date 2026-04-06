@@ -2064,8 +2064,18 @@ Phase 1 – Woche 1 (13.–19. April): Fundamente
     }
 
     async function loadFromSupabase() {
+      // Wait a bit for Supabase to be ready
+      let attempts = 0;
+      while (!getSupabase() && attempts < 10) {
+        await new Promise(r => setTimeout(r, 200));
+        attempts++;
+      }
+      
       const sb = getSupabase();
-      if (!sb) return false;
+      if (!sb) {
+        console.warn('Supabase not available');
+        return false;
+      }
       
       try {
         const { data, error } = await sb
@@ -2077,6 +2087,7 @@ Phase 1 – Woche 1 (13.–19. April): Fundamente
         if (error && error.code !== 'PGRST116') throw error;
         
         if (data) {
+          console.log('Loaded from Supabase:', data);
           if (data.config) localStorage.setItem('zp10_config', JSON.stringify(data.config));
           if (data.events) localStorage.setItem('zp10_events', JSON.stringify(data.events));
           if (data.logs) localStorage.setItem('zp10_logs', JSON.stringify(data.logs));
