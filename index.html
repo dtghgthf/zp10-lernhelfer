@@ -1,0 +1,2863 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZP10 Lernhelfer</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       DESIGN SYSTEM - Anthropic-inspired
+       ============================================ */
+    :root {
+      /* Core Colors - Dark Mode (Default) */
+      --color-bg: #171614;
+      --color-surface: #1c1b19;
+      --color-surface-elevated: #242320;
+      --color-border: #2e2d2a;
+      --color-text: #cdccca;
+      --color-text-secondary: #8a8985;
+      --color-text-muted: #5c5b58;
+      
+      /* Subject Colors */
+      --color-de: #4f98a3;
+      --color-de-bg: rgba(79, 152, 163, 0.15);
+      --color-en: #e8af34;
+      --color-en-bg: rgba(232, 175, 52, 0.15);
+      --color-ma: #6daa45;
+      --color-ma-bg: rgba(109, 170, 69, 0.15);
+      --color-exam: #dd6974;
+      --color-exam-bg: rgba(221, 105, 116, 0.15);
+      
+      /* Semantic Colors */
+      --color-primary: #4f98a3;
+      --color-success: #6daa45;
+      --color-warning: #e8af34;
+      --color-error: #dd6974;
+      
+      /* Typography */
+      --font-display: 'Cabinet Grotesk', -apple-system, sans-serif;
+      --font-body: 'Satoshi', -apple-system, sans-serif;
+      
+      /* Spacing */
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-2xl: 48px;
+      
+      /* Radii */
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      
+      /* Transitions */
+      --transition-fast: 120ms cubic-bezier(0.16, 1, 0.3, 1);
+      --transition-base: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+      --transition-slow: 300ms cubic-bezier(0.16, 1, 0.3, 1);
+      
+      /* Shadows */
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    
+    /* Light Mode */
+    [data-theme="light"] {
+      --color-bg: #faf9f7;
+      --color-surface: #ffffff;
+      --color-surface-elevated: #ffffff;
+      --color-border: #e8e6e3;
+      --color-text: #1a1918;
+      --color-text-secondary: #6b6966;
+      --color-text-muted: #9a9894;
+      
+      --color-de: #01696f;
+      --color-en: #d19900;
+      --color-ma: #437a22;
+      --color-exam: #c4424f;
+      
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    /* ============================================
+       BASE STYLES
+       ============================================ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+    
+    body {
+      font-family: var(--font-body);
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.5;
+      min-height: 100vh;
+      overflow-x: hidden;
+      max-width: 100vw;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    
+    a {
+      color: var(--color-primary);
+      text-decoration: none;
+    }
+    
+    button {
+      font-family: var(--font-body);
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+    
+    input, textarea, select {
+      font-family: var(--font-body);
+      font-size: 1rem;
+    }
+
+    /* ============================================
+       LAYOUT
+       ============================================ */
+    .app-container {
+      display: flex;
+      min-height: 100vh;
+      width: 100%;
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+    
+    /* Sidebar - Desktop */
+    .sidebar {
+      width: 240px;
+      background: var(--color-surface);
+      border-right: 1px solid var(--color-border);
+      padding: var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      z-index: 100;
+    }
+    
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-2xl);
+    }
+    
+    .sidebar-logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--color-de), var(--color-ma));
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+    
+    .sidebar-logo-text {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.25rem;
+    }
+    
+    .sidebar-nav {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      color: var(--color-text-secondary);
+      font-weight: 500;
+      transition: all var(--transition-base);
+    }
+    
+    .nav-item:hover {
+      background: var(--color-surface-elevated);
+      color: var(--color-text);
+    }
+    
+    .nav-item.active {
+      background: var(--color-primary);
+      color: white;
+    }
+    
+    .nav-item-icon {
+      font-size: 1.25rem;
+      width: 24px;
+      text-align: center;
+    }
+    
+    .sidebar-footer {
+      padding-top: var(--space-lg);
+      border-top: 1px solid var(--color-border);
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+    
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      margin-left: 240px;
+      padding: var(--space-xl);
+      min-height: 100vh;
+      width: calc(100% - 240px);
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+    
+    .page {
+      display: none;
+      animation: fadeIn var(--transition-slow);
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+    
+    .page.active {
+      display: block;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .page-header {
+      margin-bottom: var(--space-xl);
+    }
+    
+    .page-title {
+      font-size: clamp(1.75rem, 4vw, 2.25rem);
+      margin-bottom: var(--space-sm);
+    }
+    
+    .page-subtitle {
+      color: var(--color-text-secondary);
+    }
+
+    /* ============================================
+       COMPONENTS
+       ============================================ */
+    
+    /* Cards */
+    .card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      transition: all var(--transition-base);
+    }
+    
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: var(--space-sm);
+    }
+    
+    /* Countdown Cards */
+    .countdown-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-lg);
+      margin-bottom: var(--space-xl);
+    }
+    
+    .countdown-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .countdown-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+    }
+    
+    .countdown-card.de::before { background: var(--color-de); }
+    .countdown-card.en::before { background: var(--color-en); }
+    .countdown-card.ma::before { background: var(--color-ma); }
+    
+    .countdown-card.urgent {
+      animation: pulse 2s infinite;
+      border-color: var(--color-exam);
+    }
+    
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(221, 105, 116, 0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(221, 105, 116, 0); }
+    }
+    
+    .countdown-subject {
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .countdown-card.de .countdown-subject { color: var(--color-de); }
+    .countdown-card.en .countdown-subject { color: var(--color-en); }
+    .countdown-card.ma .countdown-subject { color: var(--color-ma); }
+    
+    .countdown-date {
+      color: var(--color-text-secondary);
+      font-size: 0.875rem;
+      margin-bottom: var(--space-md);
+    }
+    
+    .countdown-days {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+    
+    .countdown-label {
+      color: var(--color-text-secondary);
+      font-size: 0.875rem;
+    }
+    
+    /* Progress Bars */
+    .progress-section {
+      margin-bottom: var(--space-xl);
+    }
+    
+    .progress-grid {
+      display: grid;
+      gap: var(--space-md);
+    }
+    
+    .progress-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    
+    .progress-label {
+      width: 80px;
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+    
+    .progress-bar {
+      flex: 1;
+      height: 8px;
+      background: var(--color-surface-elevated);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width var(--transition-slow);
+    }
+    
+    .progress-fill.de { background: var(--color-de); }
+    .progress-fill.en { background: var(--color-en); }
+    .progress-fill.ma { background: var(--color-ma); }
+    
+    .progress-value {
+      width: 50px;
+      text-align: right;
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+    }
+    
+    /* Sessions List */
+    .sessions-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    
+    .session-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-md);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-base);
+    }
+    
+    .session-item:hover {
+      background: var(--color-surface-elevated);
+      border-color: var(--color-primary);
+    }
+    
+    .session-indicator {
+      width: 4px;
+      height: 40px;
+      border-radius: 2px;
+    }
+    
+    .session-indicator.de { background: var(--color-de); }
+    .session-indicator.en { background: var(--color-en); }
+    .session-indicator.ma { background: var(--color-ma); }
+    .session-indicator.exam { background: var(--color-exam); }
+    
+    .session-info {
+      flex: 1;
+    }
+    
+    .session-title {
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+    
+    .session-meta {
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+    }
+    
+    .session-badge {
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .session-badge.priority {
+      background: var(--color-warning);
+      color: #000;
+    }
+    
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      padding: var(--space-md) var(--space-lg);
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.9375rem;
+      transition: all var(--transition-base);
+    }
+    
+    .btn-primary {
+      background: var(--color-primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+    
+    .btn-secondary {
+      background: var(--color-surface-elevated);
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--color-border);
+    }
+    
+    .btn-success {
+      background: var(--color-success);
+      color: white;
+    }
+    
+    .btn-danger {
+      background: var(--color-error);
+      color: white;
+    }
+    
+    .btn-ghost {
+      background: transparent;
+      color: var(--color-text-secondary);
+    }
+    
+    .btn-ghost:hover {
+      background: var(--color-surface-elevated);
+      color: var(--color-text);
+    }
+    
+    .btn-lg {
+      padding: var(--space-lg) var(--space-xl);
+      font-size: 1rem;
+    }
+    
+    .btn-sm {
+      padding: var(--space-sm) var(--space-md);
+      font-size: 0.875rem;
+    }
+    
+    .btn-block {
+      width: 100%;
+    }
+
+    /* Form Elements */
+    .form-group {
+      margin-bottom: var(--space-lg);
+    }
+    
+    .form-label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: var(--space-sm);
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: var(--space-md);
+      background: var(--color-surface-elevated);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      color: var(--color-text);
+      transition: all var(--transition-base);
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(79, 152, 163, 0.2);
+    }
+    
+    .form-input::placeholder {
+      color: var(--color-text-muted);
+    }
+    
+    textarea.form-input {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    .form-hint {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      margin-top: var(--space-xs);
+    }
+    
+    /* Toggle Switch */
+    .toggle-wrapper {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    
+    .toggle {
+      position: relative;
+      width: 48px;
+      height: 28px;
+      background: var(--color-border);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all var(--transition-base);
+    }
+    
+    .toggle.active {
+      background: var(--color-primary);
+    }
+    
+    .toggle::after {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: all var(--transition-base);
+    }
+    
+    .toggle.active::after {
+      transform: translateX(20px);
+    }
+    
+    /* Slider */
+    .slider-wrapper {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    
+    .slider {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 6px;
+      background: var(--color-border);
+      border-radius: 3px;
+      outline: none;
+    }
+    
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      background: var(--color-primary);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all var(--transition-base);
+    }
+    
+    .slider::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+    }
+    
+    .slider-value {
+      font-size: 1.5rem;
+      width: 40px;
+      text-align: center;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--transition-base);
+      padding: var(--space-lg);
+    }
+    
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .modal {
+      background: var(--color-surface);
+      border-radius: var(--radius-xl);
+      max-width: 560px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: translateY(20px);
+      transition: all var(--transition-base);
+    }
+    
+    .modal-overlay.active .modal {
+      transform: translateY(0);
+    }
+    
+    .modal-header {
+      padding: var(--space-lg);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+    
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      color: var(--color-text-secondary);
+      transition: all var(--transition-base);
+    }
+    
+    .modal-close:hover {
+      background: var(--color-surface-elevated);
+      color: var(--color-text);
+    }
+    
+    .modal-body {
+      padding: var(--space-lg);
+    }
+    
+    .modal-footer {
+      padding: var(--space-lg);
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      gap: var(--space-md);
+      justify-content: flex-end;
+    }
+
+    /* Calendar */
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-lg);
+    }
+    
+    .calendar-nav {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    
+    .calendar-nav-btn {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-md);
+      color: var(--color-text-secondary);
+      transition: all var(--transition-base);
+    }
+    
+    .calendar-nav-btn:hover {
+      background: var(--color-surface-elevated);
+      color: var(--color-text);
+    }
+    
+    .calendar-month {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    
+    .calendar-view-toggle {
+      display: flex;
+      background: var(--color-surface-elevated);
+      border-radius: var(--radius-md);
+      padding: 4px;
+    }
+    
+    .calendar-view-btn {
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      transition: all var(--transition-base);
+    }
+    
+    .calendar-view-btn.active {
+      background: var(--color-primary);
+      color: white;
+    }
+    
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      width: 100%;
+    }
+    
+    .calendar-day-header {
+      padding: var(--space-md);
+      background: var(--color-surface-elevated);
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-secondary);
+    }
+    
+    .calendar-day {
+      min-height: 100px;
+      padding: var(--space-sm);
+      background: var(--color-surface);
+      cursor: pointer;
+      transition: all var(--transition-base);
+      overflow: hidden;
+      min-width: 0;
+    }
+    
+    .calendar-day:hover {
+      background: var(--color-surface-elevated);
+    }
+    
+    .calendar-day.other-month {
+      opacity: 0.4;
+    }
+    
+    .calendar-day.today {
+      background: var(--color-surface-elevated);
+    }
+    
+    .calendar-day-number {
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .calendar-day.today .calendar-day-number {
+      background: var(--color-primary);
+      color: white;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    
+    .calendar-event {
+      padding: 2px var(--space-xs);
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+      max-width: 100%;
+    }
+    
+    .calendar-event.de {
+      background: var(--color-de-bg);
+      color: var(--color-de);
+    }
+    
+    .calendar-event.en {
+      background: var(--color-en-bg);
+      color: var(--color-en);
+    }
+    
+    .calendar-event.ma {
+      background: var(--color-ma-bg);
+      color: var(--color-ma);
+    }
+    
+    .calendar-event.exam {
+      background: var(--color-exam-bg);
+      color: var(--color-exam);
+      font-weight: 600;
+    }
+    
+    .calendar-event.done {
+      opacity: 0.5;
+      text-decoration: line-through;
+    }
+    
+    .calendar-event.missed {
+      border: 1px dashed var(--color-warning);
+    }
+
+    /* Diary / Tagebuch */
+    .diary-filters {
+      display: flex;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+      flex-wrap: wrap;
+    }
+    
+    .filter-chip {
+      padding: var(--space-sm) var(--space-md);
+      background: var(--color-surface-elevated);
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all var(--transition-base);
+    }
+    
+    .filter-chip:hover {
+      border-color: var(--color-text-muted);
+    }
+    
+    .filter-chip.active {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: white;
+    }
+    
+    .diary-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+    
+    .diary-entry {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    
+    .diary-entry-header {
+      padding: var(--space-md) var(--space-lg);
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      cursor: pointer;
+    }
+    
+    .diary-entry-indicator {
+      width: 4px;
+      height: 48px;
+      border-radius: 2px;
+    }
+    
+    .diary-entry-indicator.de { background: var(--color-de); }
+    .diary-entry-indicator.en { background: var(--color-en); }
+    .diary-entry-indicator.ma { background: var(--color-ma); }
+    
+    .diary-entry-info {
+      flex: 1;
+    }
+    
+    .diary-entry-title {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    
+    .diary-entry-date {
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+    }
+    
+    .diary-entry-ratings {
+      display: flex;
+      gap: var(--space-md);
+    }
+    
+    .diary-rating {
+      text-align: center;
+    }
+    
+    .diary-rating-label {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+    }
+    
+    .diary-rating-value {
+      font-size: 1.25rem;
+    }
+    
+    .diary-entry-content {
+      padding: 0 var(--space-lg) var(--space-lg) calc(var(--space-lg) + 4px + var(--space-md));
+      display: none;
+    }
+    
+    .diary-entry.expanded .diary-entry-content {
+      display: block;
+    }
+    
+    .diary-entry-notes {
+      background: var(--color-surface-elevated);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      font-size: 0.9375rem;
+    }
+    
+    .diary-ai-badge {
+      padding: var(--space-xs) var(--space-sm);
+      background: var(--color-primary);
+      color: white;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    /* Settings */
+    .settings-section {
+      margin-bottom: var(--space-xl);
+    }
+    
+    .settings-section-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--color-border);
+    }
+    
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-md) 0;
+    }
+    
+    .settings-row-info {
+      flex: 1;
+    }
+    
+    .settings-row-title {
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+    
+    .settings-row-desc {
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+    }
+    
+    .api-key-wrapper {
+      display: flex;
+      gap: var(--space-sm);
+    }
+    
+    .api-key-wrapper .form-input {
+      flex: 1;
+    }
+
+    /* Onboarding */
+    .onboarding-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--color-bg);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-xl);
+    }
+    
+    .onboarding-container {
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .onboarding-step {
+      display: none;
+      animation: fadeIn var(--transition-slow);
+    }
+    
+    .onboarding-step.active {
+      display: block;
+    }
+    
+    .onboarding-header {
+      text-align: center;
+      margin-bottom: var(--space-xl);
+    }
+    
+    .onboarding-icon {
+      font-size: 4rem;
+      margin-bottom: var(--space-lg);
+    }
+    
+    .onboarding-title {
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      margin-bottom: var(--space-sm);
+    }
+    
+    .onboarding-subtitle {
+      color: var(--color-text-secondary);
+    }
+    
+    .onboarding-content {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+    }
+    
+    .onboarding-footer {
+      margin-top: var(--space-xl);
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+    
+    .onboarding-progress {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-xl);
+    }
+    
+    .onboarding-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--color-border);
+      transition: all var(--transition-base);
+    }
+    
+    .onboarding-dot.active {
+      background: var(--color-primary);
+      width: 24px;
+      border-radius: 4px;
+    }
+    
+    .onboarding-dot.done {
+      background: var(--color-success);
+    }
+
+    /* Loading */
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--color-border);
+      border-top-color: var(--color-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .loading-overlay {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-lg);
+      padding: var(--space-2xl);
+    }
+    
+    .loading-text {
+      color: var(--color-text-secondary);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: var(--space-2xl);
+      color: var(--color-text-secondary);
+    }
+    
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: var(--space-lg);
+      opacity: 0.5;
+    }
+
+    /* Status Badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .status-badge.open {
+      background: var(--color-surface-elevated);
+      color: var(--color-text-secondary);
+    }
+    
+    .status-badge.done {
+      background: rgba(109, 170, 69, 0.2);
+      color: var(--color-success);
+    }
+    
+    .status-badge.skipped {
+      background: rgba(232, 175, 52, 0.2);
+      color: var(--color-warning);
+    }
+    
+    .status-badge.adjusted {
+      background: rgba(79, 152, 163, 0.2);
+      color: var(--color-primary);
+    }
+
+    /* Alerts */
+    .alert {
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-lg);
+    }
+    
+    .alert-success {
+      background: rgba(109, 170, 69, 0.15);
+      border: 1px solid var(--color-success);
+      color: var(--color-success);
+    }
+    
+    .alert-error {
+      background: rgba(221, 105, 116, 0.15);
+      border: 1px solid var(--color-error);
+      color: var(--color-error);
+    }
+    
+    .alert-info {
+      background: rgba(79, 152, 163, 0.15);
+      border: 1px solid var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    /* AI Assessment Card */
+    .ai-card {
+      background: linear-gradient(135deg, var(--color-surface), var(--color-surface-elevated));
+      border: 1px solid var(--color-primary);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .ai-card::before {
+      content: '🤖';
+      position: absolute;
+      top: var(--space-md);
+      right: var(--space-md);
+      font-size: 1.5rem;
+      opacity: 0.3;
+    }
+    
+    .ai-card-title {
+      font-weight: 600;
+      margin-bottom: var(--space-sm);
+      color: var(--color-primary);
+    }
+    
+    .ai-card-content {
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* Diff Preview */
+    .diff-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+    
+    .diff-item {
+      background: var(--color-surface-elevated);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+    }
+    
+    .diff-item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-sm);
+    }
+    
+    .diff-item-title {
+      font-weight: 500;
+    }
+    
+    .diff-item-actions {
+      display: flex;
+      gap: var(--space-xs);
+    }
+    
+    .diff-item-content {
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+    }
+    
+    .diff-item-reason {
+      font-size: 0.8125rem;
+      color: var(--color-text-muted);
+      font-style: italic;
+      margin-top: var(--space-sm);
+    }
+    
+    .diff-action-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      transition: all var(--transition-base);
+    }
+    
+    .diff-action-btn.accept {
+      background: rgba(109, 170, 69, 0.2);
+      color: var(--color-success);
+    }
+    
+    .diff-action-btn.accept:hover {
+      background: var(--color-success);
+      color: white;
+    }
+    
+    .diff-action-btn.reject {
+      background: rgba(221, 105, 116, 0.2);
+      color: var(--color-error);
+    }
+    
+    .diff-action-btn.reject:hover {
+      background: var(--color-error);
+      color: white;
+    }
+
+    /* ============================================
+       MOBILE RESPONSIVE
+       ============================================ */
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        padding: var(--space-md);
+        padding-bottom: 80px;
+        max-width: 100vw;
+        overflow-x: hidden;
+      }
+      
+      .onboarding-overlay {
+        padding: var(--space-md);
+      }
+      
+      .onboarding-container {
+        max-height: 85vh;
+      }
+      
+      .onboarding-content {
+        padding: var(--space-md);
+      }
+      
+      .modal-overlay {
+        padding: var(--space-md);
+      }
+      
+      .modal {
+        max-width: calc(100vw - 32px);
+        max-height: 85vh;
+      }
+      
+      .mobile-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--color-surface);
+        border-top: 1px solid var(--color-border);
+        padding: var(--space-sm);
+        z-index: 100;
+      }
+      
+      .mobile-nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        padding: var(--space-sm);
+        color: var(--color-text-secondary);
+        font-size: 0.75rem;
+        transition: all var(--transition-base);
+      }
+      
+      .mobile-nav-item.active {
+        color: var(--color-primary);
+      }
+      
+      .mobile-nav-item-icon {
+        font-size: 1.25rem;
+      }
+      
+      .countdown-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .calendar-day {
+        min-height: 60px;
+      }
+      
+      .calendar-day-header {
+        padding: var(--space-sm);
+        font-size: 0.625rem;
+      }
+    }
+    
+    /* Extra small screens */
+    @media (max-width: 400px) {
+      .onboarding-container {
+        max-height: 80vh;
+      }
+      
+      .onboarding-content {
+        padding: var(--space-sm);
+      }
+      
+      .onboarding-title {
+        font-size: 1.25rem;
+      }
+      
+      .btn {
+        padding: var(--space-sm) var(--space-md);
+        font-size: 0.875rem;
+      }
+    }
+    
+    /* Hide mobile nav on desktop */
+    .mobile-nav {
+      display: none;
+    }
+    
+    @media (max-width: 768px) {
+      .mobile-nav {
+        display: flex;
+      }
+    }
+
+    /* Hidden utility */
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Onboarding Overlay -->
+  <div class="onboarding-overlay" id="onboarding">
+    <div class="onboarding-container">
+      <div class="onboarding-progress">
+        <div class="onboarding-dot active" data-step="1"></div>
+        <div class="onboarding-dot" data-step="2"></div>
+        <div class="onboarding-dot" data-step="3"></div>
+      </div>
+      
+      <!-- Step 1: Welcome -->
+      <div class="onboarding-step active" data-step="1">
+        <div class="onboarding-header">
+          <div class="onboarding-icon">👋</div>
+          <h1 class="onboarding-title">Willkommen, Erik!</h1>
+          <p class="onboarding-subtitle">Lass uns deinen ZP10-Lernplan einrichten.</p>
+        </div>
+        <div class="onboarding-content">
+          <div class="form-group">
+            <label class="form-label">OpenRouter API Key</label>
+            <div class="api-key-wrapper">
+              <input type="password" class="form-input" id="onboarding-api-key" placeholder="sk-or-...">
+              <button class="btn btn-secondary" onclick="toggleApiKeyVisibility('onboarding-api-key')">👁</button>
+            </div>
+            <p class="form-hint">Du bekommst deinen API Key unter <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a></p>
+          </div>
+          <div id="api-test-result"></div>
+        </div>
+        <div class="onboarding-footer">
+          <div></div>
+          <button class="btn btn-primary" onclick="testApiKey()">API Key testen →</button>
+        </div>
+      </div>
+      
+      <!-- Step 2: Plan Input -->
+      <div class="onboarding-step" data-step="2">
+        <div class="onboarding-header">
+          <div class="onboarding-icon">📝</div>
+          <h1 class="onboarding-title">Dein Lernplan</h1>
+          <p class="onboarding-subtitle">Füge deinen Lernplan ein und die KI erstellt deine Sessions.</p>
+        </div>
+        <div class="onboarding-content">
+          <div class="form-group">
+            <label class="form-label">Lernplan-Text</label>
+            <textarea class="form-input" id="plan-input" rows="10" placeholder="Füge hier deinen Lernplan ein...
+              
+Beispiel:
+Phase 1 – Woche 1 (13.–19. April): Fundamente
+- Mo 13.4 | 19:00–19:45 | DE | Analyse-Fahrplan auswendig lernen
+- Di 14.4 | 17:30–19:00 | DE | Stilmittel-Liste (~15)
+..."></textarea>
+          </div>
+          <div id="parse-loading" class="loading-overlay hidden">
+            <div class="loading-spinner" style="width: 40px; height: 40px;"></div>
+            <div class="loading-text">KI analysiert deinen Lernplan...</div>
+          </div>
+        </div>
+        <div class="onboarding-footer">
+          <button class="btn btn-ghost" onclick="goToOnboardingStep(1)">← Zurück</button>
+          <button class="btn btn-primary" id="parse-btn" onclick="parsePlan()">🤖 Plan per KI einlesen</button>
+        </div>
+      </div>
+      
+      <!-- Step 3: Success -->
+      <div class="onboarding-step" data-step="3">
+        <div class="onboarding-header">
+          <div class="onboarding-icon">🎉</div>
+          <h1 class="onboarding-title">Geschafft!</h1>
+          <p class="onboarding-subtitle"><span id="events-count">0</span> Lerneinheiten wurden erstellt.</p>
+        </div>
+        <div class="onboarding-content">
+          <div id="events-preview" class="sessions-list"></div>
+        </div>
+        <div class="onboarding-footer">
+          <div></div>
+          <button class="btn btn-primary btn-lg" onclick="completeOnboarding()">Los geht's! →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div class="app-container" id="app" style="display: none;">
+    <!-- Sidebar - Desktop -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">📚</div>
+        <div class="sidebar-logo-text">ZP10</div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">
+          <span class="nav-item-icon">🏠</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" data-page="calendar" onclick="showPage('calendar')">
+          <span class="nav-item-icon">📅</span>
+          <span>Kalender</span>
+        </a>
+        <a href="#" class="nav-item" data-page="diary" onclick="showPage('diary')">
+          <span class="nav-item-icon">📓</span>
+          <span>Tagebuch</span>
+        </a>
+        <a href="#" class="nav-item" data-page="settings" onclick="showPage('settings')">
+          <span class="nav-item-icon">⚙️</span>
+          <span>Einstellungen</span>
+        </a>
+      </nav>
+      
+      <div class="sidebar-footer">
+        ZP10 Lernhelfer v1.0
+      </div>
+    </aside>
+    
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+      <a href="#" class="mobile-nav-item active" data-page="dashboard" onclick="showPage('dashboard')">
+        <span class="mobile-nav-item-icon">🏠</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" class="mobile-nav-item" data-page="calendar" onclick="showPage('calendar')">
+        <span class="mobile-nav-item-icon">📅</span>
+        <span>Kalender</span>
+      </a>
+      <a href="#" class="mobile-nav-item" data-page="diary" onclick="showPage('diary')">
+        <span class="mobile-nav-item-icon">📓</span>
+        <span>Tagebuch</span>
+      </a>
+      <a href="#" class="mobile-nav-item" data-page="settings" onclick="showPage('settings')">
+        <span class="mobile-nav-item-icon">⚙️</span>
+        <span>Einstellungen</span>
+      </a>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Dashboard Page -->
+      <section class="page active" id="page-dashboard">
+        <div class="page-header">
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-subtitle">Dein ZP10-Überblick</p>
+        </div>
+        
+        <!-- Countdown Cards -->
+        <div class="countdown-grid" id="countdown-grid">
+          <!-- Generated by JS -->
+        </div>
+        
+        <!-- Progress Section -->
+        <div class="progress-section">
+          <h2 class="card-title" style="margin-bottom: var(--space-md);">Fortschritt</h2>
+          <div class="progress-grid" id="progress-grid">
+            <!-- Generated by JS -->
+          </div>
+        </div>
+        
+        <!-- Next Sessions -->
+        <div class="card" style="margin-bottom: var(--space-xl);">
+          <h3 class="card-title">Nächste Sessions</h3>
+          <div class="sessions-list" id="next-sessions">
+            <!-- Generated by JS -->
+          </div>
+        </div>
+        
+        <!-- Today Button -->
+        <div id="today-button-container"></div>
+        
+        <!-- AI Assessment -->
+        <div id="ai-assessment-container"></div>
+      </section>
+      
+      <!-- Calendar Page -->
+      <section class="page" id="page-calendar">
+        <div class="page-header">
+          <h1 class="page-title">Kalender</h1>
+        </div>
+        
+        <div class="calendar-header">
+          <div class="calendar-nav">
+            <button class="calendar-nav-btn" onclick="navigateMonth(-1)">◀</button>
+            <span class="calendar-month" id="calendar-month">April 2026</span>
+            <button class="calendar-nav-btn" onclick="navigateMonth(1)">▶</button>
+          </div>
+          <div class="calendar-view-toggle">
+            <button class="calendar-view-btn active" data-view="month" onclick="setCalendarView('month')">Monat</button>
+            <button class="calendar-view-btn" data-view="week" onclick="setCalendarView('week')">Woche</button>
+          </div>
+        </div>
+        
+        <div class="calendar-grid" id="calendar-grid">
+          <!-- Generated by JS -->
+        </div>
+      </section>
+      
+      <!-- Diary Page -->
+      <section class="page" id="page-diary">
+        <div class="page-header">
+          <h1 class="page-title">Tagebuch</h1>
+          <p class="page-subtitle">Deine abgeschlossenen Sessions</p>
+        </div>
+        
+        <div class="diary-filters" id="diary-filters">
+          <button class="filter-chip active" data-filter="all" onclick="filterDiary('all')">Alle</button>
+          <button class="filter-chip" data-filter="DE" onclick="filterDiary('DE')">📝 Deutsch</button>
+          <button class="filter-chip" data-filter="EN" onclick="filterDiary('EN')">🇬🇧 Englisch</button>
+          <button class="filter-chip" data-filter="MA" onclick="filterDiary('MA')">📐 Mathe</button>
+        </div>
+        
+        <div class="diary-list" id="diary-list">
+          <!-- Generated by JS -->
+        </div>
+      </section>
+      
+      <!-- Settings Page -->
+      <section class="page" id="page-settings">
+        <div class="page-header">
+          <h1 class="page-title">Einstellungen</h1>
+        </div>
+        
+        <div class="settings-section">
+          <h3 class="settings-section-title">API Konfiguration</h3>
+          <div class="form-group">
+            <label class="form-label">OpenRouter API Key</label>
+            <div class="api-key-wrapper">
+              <input type="password" class="form-input" id="settings-api-key" placeholder="sk-or-...">
+              <button class="btn btn-secondary" onclick="toggleApiKeyVisibility('settings-api-key')">👁</button>
+              <button class="btn btn-primary" onclick="saveApiKey()">Speichern</button>
+            </div>
+          </div>
+          <button class="btn btn-secondary" onclick="testApiKeySettings()">🧪 API Key testen</button>
+          <div id="settings-api-test-result" style="margin-top: var(--space-md);"></div>
+        </div>
+        
+        <div class="settings-section">
+          <h3 class="settings-section-title">Erscheinungsbild</h3>
+          <div class="settings-row">
+            <div class="settings-row-info">
+              <div class="settings-row-title">Dark Mode</div>
+              <div class="settings-row-desc">Dunkles Farbschema verwenden</div>
+            </div>
+            <div class="toggle active" id="theme-toggle" onclick="toggleTheme()"></div>
+          </div>
+        </div>
+        
+        <div class="settings-section">
+          <h3 class="settings-section-title">Lernplan</h3>
+          <div class="form-group">
+            <label class="form-label">Plan neu einlesen</label>
+            <textarea class="form-input" id="settings-plan-input" rows="6" placeholder="Füge hier deinen neuen Lernplan ein..."></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="reparsePlan()">🤖 Per KI einlesen</button>
+        </div>
+        
+        <div class="settings-section">
+          <h3 class="settings-section-title">Daten verwalten</h3>
+          <div style="display: flex; gap: var(--space-md); flex-wrap: wrap;">
+            <button class="btn btn-secondary" onclick="resetEvents()">📅 Events zurücksetzen</button>
+            <button class="btn btn-danger" onclick="clearLogs()">🗑 Logs löschen</button>
+          </div>
+        </div>
+        
+        <div class="settings-section">
+          <h3 class="settings-section-title">Info</h3>
+          <p style="color: var(--color-text-secondary); font-size: 0.875rem;">
+            ZP10 Lernhelfer v1.0<br>
+            Prüfungstermine: DE 13.05.2026 | EN 19.05.2026 | MA 28.05.2026
+          </p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Event Detail Modal -->
+  <div class="modal-overlay" id="event-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="event-modal-title">Session Details</h2>
+        <button class="modal-close" onclick="closeModal('event-modal')">✕</button>
+      </div>
+      <div class="modal-body" id="event-modal-body">
+        <!-- Generated by JS -->
+      </div>
+      <div class="modal-footer" id="event-modal-footer">
+        <!-- Generated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Session Log Modal -->
+  <div class="modal-overlay" id="log-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Session abschließen</h2>
+        <button class="modal-close" onclick="closeModal('log-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Wie gut lief die Session?</label>
+          <div class="slider-wrapper">
+            <input type="range" class="slider" id="log-rating" min="1" max="5" value="3">
+            <span class="slider-value" id="log-rating-value">😐</span>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Wie viel hast du verstanden?</label>
+          <div class="slider-wrapper">
+            <input type="range" class="slider" id="log-understanding" min="1" max="5" value="3">
+            <span class="slider-value" id="log-understanding-value">😐</span>
+          </div>
+        </div>
+        
+        <div class="form-group" id="log-topics-container">
+          <label class="form-label">Behandelte Themen</label>
+          <div id="log-topics"></div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Notizen (optional)</label>
+          <textarea class="form-input" id="log-notes" rows="3" placeholder="Was war unklar? Was lief gut?"></textarea>
+        </div>
+        
+        <div class="toggle-wrapper">
+          <div class="toggle" id="ai-adjust-toggle" onclick="toggleAiAdjust()"></div>
+          <span>🤖 KI soll Plan anpassen</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('log-modal')">Abbrechen</button>
+        <button class="btn btn-success" onclick="saveSessionLog()">✅ Speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Diff Preview Modal -->
+  <div class="modal-overlay" id="diff-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">KI-Anpassungsvorschläge</h2>
+        <button class="modal-close" onclick="closeModal('diff-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="ai-card" style="margin-bottom: var(--space-lg);">
+          <div class="ai-card-title">KI-Einschätzung</div>
+          <div class="ai-card-content" id="ai-assessment-text"></div>
+        </div>
+        <div class="diff-list" id="diff-list"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="rejectAllChanges()">Alle ablehnen</button>
+        <button class="btn btn-success" onclick="acceptAllChanges()">Alle akzeptieren</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Modal -->
+  <div class="modal-overlay" id="loading-modal">
+    <div class="modal" style="max-width: 300px;">
+      <div class="modal-body">
+        <div class="loading-overlay">
+          <div class="loading-spinner" style="width: 48px; height: 48px;"></div>
+          <div class="loading-text" id="loading-text">KI analysiert...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================
+    // UTILITY FUNCTIONS
+    // ============================================
+    
+    function generateUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+    
+    function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('de-DE', { weekday: 'short', day: 'numeric', month: 'short' });
+    }
+    
+    function formatDateFull(dateStr) {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    
+    function getDaysUntil(dateStr) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const target = new Date(dateStr);
+      target.setHours(0, 0, 0, 0);
+      const diff = target - today;
+      return Math.ceil(diff / (1000 * 60 * 60 * 24));
+    }
+    
+    function getSubjectEmoji(subject) {
+      const emojis = { DE: '📝', EN: '🇬🇧', MA: '📐', EXAM: '🏁' };
+      return emojis[subject] || '📚';
+    }
+    
+    function getSubjectName(subject) {
+      const names = { DE: 'Deutsch', EN: 'Englisch', MA: 'Mathe', EXAM: 'Prüfung' };
+      return names[subject] || subject;
+    }
+    
+    function getRatingEmoji(value) {
+      const emojis = ['😵', '😕', '😐', '🙂', '😊'];
+      return emojis[value - 1] || '😐';
+    }
+
+    // ============================================
+    // DATA MANAGEMENT
+    // ============================================
+    
+    function getConfig() {
+      const config = localStorage.getItem('zp10_config');
+      return config ? JSON.parse(config) : { apiKey: '', setupDone: false, theme: 'dark' };
+    }
+    
+    function saveConfig(config) {
+      localStorage.setItem('zp10_config', JSON.stringify(config));
+    }
+    
+    function getEvents() {
+      const events = localStorage.getItem('zp10_events');
+      return events ? JSON.parse(events) : [];
+    }
+    
+    function saveEvents(events) {
+      localStorage.setItem('zp10_events', JSON.stringify(events));
+    }
+    
+    function getLogs() {
+      const logs = localStorage.getItem('zp10_logs');
+      return logs ? JSON.parse(logs) : [];
+    }
+    
+    function saveLogs(logs) {
+      localStorage.setItem('zp10_logs', JSON.stringify(logs));
+    }
+    
+    function getEventById(id) {
+      return getEvents().find(e => e.id === id);
+    }
+    
+    function updateEvent(id, updates) {
+      const events = getEvents();
+      const index = events.findIndex(e => e.id === id);
+      if (index !== -1) {
+        events[index] = { ...events[index], ...updates };
+        saveEvents(events);
+      }
+    }
+
+    // ============================================
+    // API CALLS
+    // ============================================
+    
+    async function callOpenRouter(prompt, apiKey) {
+      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://zp10-lernhelfer.local',
+          'X-Title': 'ZP10 Lernhelfer'
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-3.1-flash-lite-preview',
+          messages: [{ role: 'user', content: prompt }],
+          response_format: { type: 'json_object' }
+        })
+      });
+      
+      if (!res.ok) {
+        throw new Error(`API Error: ${res.status}`);
+      }
+      
+      const data = await res.json();
+      return JSON.parse(data.choices[0].message.content);
+    }
+
+    // ============================================
+    // ONBOARDING
+    // ============================================
+    
+    let currentOnboardingStep = 1;
+    
+    function goToOnboardingStep(step) {
+      currentOnboardingStep = step;
+      document.querySelectorAll('.onboarding-step').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.onboarding-dot').forEach(d => {
+        d.classList.remove('active', 'done');
+        const dotStep = parseInt(d.dataset.step);
+        if (dotStep < step) d.classList.add('done');
+        if (dotStep === step) d.classList.add('active');
+      });
+      document.querySelector(`.onboarding-step[data-step="${step}"]`).classList.add('active');
+    }
+    
+    async function testApiKey() {
+      const apiKey = document.getElementById('onboarding-api-key').value.trim();
+      const resultDiv = document.getElementById('api-test-result');
+      
+      if (!apiKey) {
+        resultDiv.innerHTML = '<div class="alert alert-error">Bitte gib einen API Key ein.</div>';
+        return;
+      }
+      
+      resultDiv.innerHTML = '<div class="loading-overlay" style="padding: var(--space-md);"><div class="loading-spinner"></div><span style="margin-left: var(--space-sm);">Teste API Key...</span></div>';
+      
+      try {
+        await callOpenRouter('Antworte mit: {"status": "ok"}', apiKey);
+        resultDiv.innerHTML = '<div class="alert alert-success">✅ API Key funktioniert!</div>';
+        
+        const config = getConfig();
+        config.apiKey = apiKey;
+        saveConfig(config);
+        
+        setTimeout(() => goToOnboardingStep(2), 1000);
+      } catch (error) {
+        resultDiv.innerHTML = `<div class="alert alert-error">❌ API Key ungültig: ${error.message}</div>`;
+      }
+    }
+    
+    async function parsePlan() {
+      const planText = document.getElementById('plan-input').value.trim();
+      
+      if (!planText) {
+        alert('Bitte füge einen Lernplan ein.');
+        return;
+      }
+      
+      const config = getConfig();
+      document.getElementById('parse-loading').classList.remove('hidden');
+      document.getElementById('parse-btn').disabled = true;
+      
+      const prompt = `Du bekommst einen deutschen Lernplan als Fließtext.
+Extrahiere ALLE Lerneinheiten und gib sie als JSON-Array zurück.
+
+Jedes Event-Objekt hat genau diese Felder:
+- id: generiere eine zufällige UUID (Format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx)
+- date: "YYYY-MM-DD"
+- startTime: "HH:MM"
+- endTime: "HH:MM"
+- subject: "DE" für Deutsch, "EN" für Englisch, "MA" für Mathe, "EXAM" für Prüfungstage
+- title: Kurztitel (max 40 Zeichen)
+- description: Detaillierter Lerninhalt (aus dem Plan-Text)
+- priority: "high" wenn ⭐ markiert oder Endspurt, sonst "normal"
+- status: immer "open"
+- isExam: true nur für die drei Prüfungstage, sonst false
+- aiAdjusted: false
+- originalDescription: gleich wie description
+
+Prüfungstermine die du als EXAM-Events eintragen musst:
+- 2026-05-13: ZP10 Deutsch (ganztägig, startTime: "08:00", endTime: "11:00", title: "🏁 ZP10 DEUTSCH")
+- 2026-05-19: ZP10 Englisch (title: "🏁 ZP10 ENGLISCH")
+- 2026-05-28: ZP10 Mathe (title: "🏁 ZP10 MATHE")
+
+Antworte NUR mit dem JSON-Array in folgendem Format:
+{"events": [...]}
+
+LERNPLAN:
+${planText}`;
+
+      try {
+        const result = await callOpenRouter(prompt, config.apiKey);
+        const events = result.events || result;
+        
+        saveEvents(events);
+        
+        // Show preview
+        document.getElementById('events-count').textContent = events.length;
+        const previewDiv = document.getElementById('events-preview');
+        previewDiv.innerHTML = events.slice(0, 5).map(event => `
+          <div class="session-item">
+            <div class="session-indicator ${event.subject.toLowerCase()}"></div>
+            <div class="session-info">
+              <div class="session-title">${event.title}</div>
+              <div class="session-meta">${formatDate(event.date)} • ${event.startTime}</div>
+            </div>
+          </div>
+        `).join('') + (events.length > 5 ? `<p style="text-align: center; color: var(--color-text-secondary);">... und ${events.length - 5} weitere</p>` : '');
+        
+        goToOnboardingStep(3);
+      } catch (error) {
+        alert('Fehler beim Parsen: ' + error.message);
+      } finally {
+        document.getElementById('parse-loading').classList.add('hidden');
+        document.getElementById('parse-btn').disabled = false;
+      }
+    }
+    
+    function completeOnboarding() {
+      const config = getConfig();
+      config.setupDone = true;
+      saveConfig(config);
+      
+      document.getElementById('onboarding').style.display = 'none';
+      document.getElementById('app').style.display = 'flex';
+      
+      initApp();
+    }
+
+    // ============================================
+    // NAVIGATION
+    // ============================================
+    
+    function showPage(pageName) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(`page-${pageName}`).classList.add('active');
+      
+      document.querySelectorAll('.nav-item, .mobile-nav-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.page === pageName);
+      });
+      
+      // Refresh page content
+      if (pageName === 'dashboard') renderDashboard();
+      if (pageName === 'calendar') renderCalendar();
+      if (pageName === 'diary') renderDiary();
+      if (pageName === 'settings') loadSettings();
+    }
+
+    // ============================================
+    // DASHBOARD
+    // ============================================
+    
+    function renderDashboard() {
+      renderCountdowns();
+      renderProgress();
+      renderNextSessions();
+      renderTodayButton();
+      renderAIAssessment();
+    }
+    
+    function renderCountdowns() {
+      const exams = [
+        { subject: 'DE', name: 'Deutsch', date: '2026-05-13' },
+        { subject: 'EN', name: 'Englisch', date: '2026-05-19' },
+        { subject: 'MA', name: 'Mathe', date: '2026-05-28' }
+      ];
+      
+      const grid = document.getElementById('countdown-grid');
+      grid.innerHTML = exams.map(exam => {
+        const days = getDaysUntil(exam.date);
+        const isUrgent = days <= 7 && days > 0;
+        return `
+          <div class="countdown-card ${exam.subject.toLowerCase()} ${isUrgent ? 'urgent' : ''}">
+            <div class="countdown-subject">${getSubjectEmoji(exam.subject)} ${exam.name}</div>
+            <div class="countdown-date">${formatDateFull(exam.date)}</div>
+            <div class="countdown-days">${days > 0 ? days : (days === 0 ? '🔥' : '✅')}</div>
+            <div class="countdown-label">${days > 0 ? 'Tage' : (days === 0 ? 'Heute!' : 'Vorbei')}</div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function renderProgress() {
+      const events = getEvents();
+      const subjects = ['DE', 'EN', 'MA'];
+      
+      const grid = document.getElementById('progress-grid');
+      grid.innerHTML = subjects.map(subject => {
+        const subjectEvents = events.filter(e => e.subject === subject && !e.isExam);
+        const doneEvents = subjectEvents.filter(e => e.status === 'done').length;
+        const total = subjectEvents.length;
+        const percentage = total > 0 ? Math.round((doneEvents / total) * 100) : 0;
+        
+        return `
+          <div class="progress-item">
+            <div class="progress-label">${getSubjectEmoji(subject)} ${getSubjectName(subject)}</div>
+            <div class="progress-bar">
+              <div class="progress-fill ${subject.toLowerCase()}" style="width: ${percentage}%"></div>
+            </div>
+            <div class="progress-value">${percentage}%</div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function renderNextSessions() {
+      const events = getEvents();
+      const today = new Date().toISOString().split('T')[0];
+      
+      const upcoming = events
+        .filter(e => e.date >= today && e.status === 'open')
+        .sort((a, b) => new Date(a.date + 'T' + a.startTime) - new Date(b.date + 'T' + b.startTime))
+        .slice(0, 3);
+      
+      const container = document.getElementById('next-sessions');
+      
+      if (upcoming.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">✨</div><p>Keine anstehenden Sessions</p></div>';
+        return;
+      }
+      
+      container.innerHTML = upcoming.map(event => `
+        <div class="session-item" onclick="openEventModal('${event.id}')">
+          <div class="session-indicator ${event.subject.toLowerCase()}"></div>
+          <div class="session-info">
+            <div class="session-title">${event.title}</div>
+            <div class="session-meta">${formatDate(event.date)} • ${event.startTime}–${event.endTime}</div>
+          </div>
+          ${event.priority === 'high' ? '<span class="session-badge priority">⭐</span>' : ''}
+        </div>
+      `).join('');
+    }
+    
+    function renderTodayButton() {
+      const events = getEvents();
+      const today = new Date().toISOString().split('T')[0];
+      const todaySession = events.find(e => e.date === today && e.status === 'open' && !e.isExam);
+      
+      const container = document.getElementById('today-button-container');
+      if (todaySession) {
+        container.innerHTML = `
+          <button class="btn btn-primary btn-lg btn-block" onclick="openEventModal('${todaySession.id}')" style="margin-bottom: var(--space-xl);">
+            📚 Heute lernen: ${todaySession.title}
+          </button>
+        `;
+      } else {
+        container.innerHTML = '';
+      }
+    }
+    
+    function renderAIAssessment() {
+      const logs = getLogs();
+      const lastAILog = logs.filter(l => l.aiResponse).pop();
+      
+      const container = document.getElementById('ai-assessment-container');
+      if (lastAILog && lastAILog.aiResponse) {
+        container.innerHTML = `
+          <div class="ai-card">
+            <div class="ai-card-title">Letzte KI-Einschätzung</div>
+            <div class="ai-card-content">${lastAILog.aiResponse.einschaetzung}</div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = '';
+      }
+    }
+
+    // ============================================
+    // CALENDAR
+    // ============================================
+    
+    let currentCalendarDate = new Date(2026, 3, 1); // April 2026
+    let calendarView = 'month';
+    
+    function setCalendarView(view) {
+      calendarView = view;
+      document.querySelectorAll('.calendar-view-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === view);
+      });
+      renderCalendar();
+    }
+    
+    function navigateMonth(delta) {
+      currentCalendarDate.setMonth(currentCalendarDate.getMonth() + delta);
+      renderCalendar();
+    }
+    
+    function renderCalendar() {
+      const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+      document.getElementById('calendar-month').textContent = `${monthNames[currentCalendarDate.getMonth()]} ${currentCalendarDate.getFullYear()}`;
+      
+      if (calendarView === 'month') {
+        renderMonthView();
+      } else {
+        renderWeekView();
+      }
+    }
+    
+    function renderMonthView() {
+      const events = getEvents();
+      const today = new Date().toISOString().split('T')[0];
+      
+      const year = currentCalendarDate.getFullYear();
+      const month = currentCalendarDate.getMonth();
+      
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const startDay = (firstDay.getDay() + 6) % 7; // Monday = 0
+      
+      const dayHeaders = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+      let html = dayHeaders.map(d => `<div class="calendar-day-header">${d}</div>`).join('');
+      
+      // Previous month days
+      const prevMonthLastDay = new Date(year, month, 0).getDate();
+      for (let i = startDay - 1; i >= 0; i--) {
+        const day = prevMonthLastDay - i;
+        html += `<div class="calendar-day other-month"><span class="calendar-day-number">${day}</span></div>`;
+      }
+      
+      // Current month days
+      for (let day = 1; day <= lastDay.getDate(); day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const isToday = dateStr === today;
+        const dayEvents = events.filter(e => e.date === dateStr);
+        
+        html += `
+          <div class="calendar-day ${isToday ? 'today' : ''}">
+            <span class="calendar-day-number">${day}</span>
+            ${dayEvents.slice(0, 3).map(e => {
+              const isMissed = e.status === 'open' && e.date < today && !e.isExam;
+              return `<div class="calendar-event ${e.subject.toLowerCase()} ${e.status === 'done' ? 'done' : ''} ${isMissed ? 'missed' : ''}" onclick="event.stopPropagation(); openEventModal('${e.id}')">${e.startTime} ${e.title}</div>`;
+            }).join('')}
+            ${dayEvents.length > 3 ? `<div style="font-size: 0.75rem; color: var(--color-text-muted);">+${dayEvents.length - 3} mehr</div>` : ''}
+          </div>
+        `;
+      }
+      
+      // Next month days
+      const totalCells = startDay + lastDay.getDate();
+      const remaining = (7 - (totalCells % 7)) % 7;
+      for (let day = 1; day <= remaining; day++) {
+        html += `<div class="calendar-day other-month"><span class="calendar-day-number">${day}</span></div>`;
+      }
+      
+      document.getElementById('calendar-grid').innerHTML = html;
+    }
+    
+    function renderWeekView() {
+      // Simplified week view - show current week's events
+      const events = getEvents();
+      const today = new Date();
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+      
+      const dayHeaders = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+      let html = dayHeaders.map(d => `<div class="calendar-day-header">${d}</div>`).join('');
+      
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(startOfWeek);
+        date.setDate(startOfWeek.getDate() + i);
+        const dateStr = date.toISOString().split('T')[0];
+        const isToday = dateStr === today.toISOString().split('T')[0];
+        const dayEvents = events.filter(e => e.date === dateStr);
+        
+        html += `
+          <div class="calendar-day ${isToday ? 'today' : ''}" style="min-height: 150px;">
+            <span class="calendar-day-number">${date.getDate()}</span>
+            ${dayEvents.map(e => `<div class="calendar-event ${e.subject.toLowerCase()} ${e.status === 'done' ? 'done' : ''}" onclick="event.stopPropagation(); openEventModal('${e.id}')">${e.startTime} ${e.title}</div>`).join('')}
+          </div>
+        `;
+      }
+      
+      document.getElementById('calendar-grid').innerHTML = html;
+    }
+
+    // ============================================
+    // EVENT MODAL
+    // ============================================
+    
+    let currentEventId = null;
+    
+    function openEventModal(eventId) {
+      currentEventId = eventId;
+      const event = getEventById(eventId);
+      if (!event) return;
+      
+      const today = new Date().toISOString().split('T')[0];
+      const isMissed = event.status === 'open' && event.date < today && !event.isExam;
+      
+      document.getElementById('event-modal-title').textContent = event.title;
+      document.getElementById('event-modal-body').innerHTML = `
+        <div style="margin-bottom: var(--space-lg);">
+          <span class="status-badge ${event.status}">${
+            event.status === 'open' ? (isMissed ? '⚠️ Verpasst' : '🔵 Offen') :
+            event.status === 'done' ? '✅ Erledigt' :
+            event.status === 'skipped' ? '⏭ Übersprungen' : '🤖 KI-angepasst'
+          }</span>
+          ${event.priority === 'high' ? '<span class="status-badge" style="background: var(--color-warning); color: #000; margin-left: var(--space-sm);">⭐ Priorität</span>' : ''}
+          ${event.aiAdjusted ? '<span class="diary-ai-badge" style="margin-left: var(--space-sm);">🤖 KI</span>' : ''}
+        </div>
+        <p><strong>${getSubjectEmoji(event.subject)} ${getSubjectName(event.subject)}</strong></p>
+        <p style="color: var(--color-text-secondary); margin: var(--space-sm) 0;">${formatDateFull(event.date)}</p>
+        <p style="color: var(--color-text-secondary);">🕐 ${event.startTime} – ${event.endTime}</p>
+        <div style="margin-top: var(--space-lg); padding: var(--space-md); background: var(--color-surface-elevated); border-radius: var(--radius-md);">
+          <strong>Inhalt:</strong><br>
+          ${event.description}
+        </div>
+      `;
+      
+      let footerHtml = '';
+      if (!event.isExam && event.status === 'open') {
+        footerHtml = `
+          <button class="btn btn-ghost" onclick="skipEvent('${eventId}')">⏭ Überspringen</button>
+          <button class="btn btn-success" onclick="openLogModal('${eventId}')">✅ Session abschließen</button>
+        `;
+      } else if (event.status === 'done') {
+        footerHtml = `<button class="btn btn-secondary" onclick="closeModal('event-modal')">Schließen</button>`;
+      } else {
+        footerHtml = `<button class="btn btn-secondary" onclick="closeModal('event-modal')">Schließen</button>`;
+      }
+      document.getElementById('event-modal-footer').innerHTML = footerHtml;
+      
+      openModal('event-modal');
+    }
+    
+    function skipEvent(eventId) {
+      if (confirm('Session wirklich überspringen?')) {
+        updateEvent(eventId, { status: 'skipped' });
+        closeModal('event-modal');
+        renderDashboard();
+        renderCalendar();
+      }
+    }
+
+    // ============================================
+    // SESSION LOG
+    // ============================================
+    
+    let aiAdjustEnabled = false;
+    
+    function openLogModal(eventId) {
+      currentEventId = eventId;
+      const event = getEventById(eventId);
+      
+      // Reset form
+      document.getElementById('log-rating').value = 3;
+      document.getElementById('log-understanding').value = 3;
+      document.getElementById('log-notes').value = '';
+      aiAdjustEnabled = false;
+      document.getElementById('ai-adjust-toggle').classList.remove('active');
+      
+      updateSliderDisplay('log-rating', 'log-rating-value');
+      updateSliderDisplay('log-understanding', 'log-understanding-value');
+      
+      // Parse topics from description
+      const topics = event.description.split(/[,;+]/).map(t => t.trim()).filter(t => t.length > 0);
+      const topicsContainer = document.getElementById('log-topics');
+      topicsContainer.innerHTML = topics.map((topic, i) => `
+        <label style="display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-sm);">
+          <input type="checkbox" id="topic-${i}" value="${topic}" checked style="width: 18px; height: 18px;">
+          ${topic}
+        </label>
+      `).join('');
+      
+      closeModal('event-modal');
+      openModal('log-modal');
+    }
+    
+    function toggleAiAdjust() {
+      aiAdjustEnabled = !aiAdjustEnabled;
+      document.getElementById('ai-adjust-toggle').classList.toggle('active', aiAdjustEnabled);
+    }
+    
+    function updateSliderDisplay(sliderId, displayId) {
+      const value = parseInt(document.getElementById(sliderId).value);
+      document.getElementById(displayId).textContent = getRatingEmoji(value);
+    }
+    
+    // Attach slider listeners
+    document.getElementById('log-rating').addEventListener('input', () => updateSliderDisplay('log-rating', 'log-rating-value'));
+    document.getElementById('log-understanding').addEventListener('input', () => updateSliderDisplay('log-understanding', 'log-understanding-value'));
+    
+    async function saveSessionLog() {
+      const event = getEventById(currentEventId);
+      const rating = parseInt(document.getElementById('log-rating').value);
+      const understanding = parseInt(document.getElementById('log-understanding').value);
+      const notes = document.getElementById('log-notes').value;
+      
+      const topicCheckboxes = document.querySelectorAll('#log-topics input:checked');
+      const topics = Array.from(topicCheckboxes).map(cb => cb.value);
+      
+      const log = {
+        id: generateUUID(),
+        eventId: currentEventId,
+        date: new Date().toISOString(),
+        rating,
+        understanding,
+        topics,
+        notes,
+        aiRequested: aiAdjustEnabled,
+        aiResponse: null
+      };
+      
+      // Update event status
+      updateEvent(currentEventId, { status: 'done' });
+      
+      // Save log
+      const logs = getLogs();
+      logs.push(log);
+      saveLogs(logs);
+      
+      closeModal('log-modal');
+      
+      if (aiAdjustEnabled) {
+        await requestAIAdjustment(log);
+      }
+      
+      renderDashboard();
+      renderCalendar();
+      renderDiary();
+    }
+    
+    async function requestAIAdjustment(log) {
+      const config = getConfig();
+      const events = getEvents();
+      const logs = getLogs();
+      const event = getEventById(log.eventId);
+      
+      // Get upcoming events (next 14 days)
+      const today = new Date();
+      const twoWeeksLater = new Date(today);
+      twoWeeksLater.setDate(today.getDate() + 14);
+      
+      const upcomingEvents = events.filter(e => {
+        const eventDate = new Date(e.date);
+        return eventDate >= today && eventDate <= twoWeeksLater && e.status === 'open';
+      });
+      
+      // Create logs summary
+      const logsSummary = logs.slice(-5).map(l => {
+        const e = getEventById(l.eventId);
+        return `${e ? e.subject : '?'}: Rating ${l.rating}/5, Verständnis ${l.understanding}/5`;
+      }).join('\n');
+      
+      showLoadingModal('KI analysiert dein Feedback...');
+      
+      const prompt = `Du bist ein Lernassistent für Erik, 16 Jahre, Gymnasium NRW Klasse 10.
+Prüfungen: Deutsch 13.05.2026, Englisch 19.05.2026, Mathe 28.05.2026.
+
+Erikschwächen:
+- Deutsch: Analysefähigkeit, Argumente finden, Wirkung erklären
+- Englisch: Fachbegriffe, Wirkung auf Englisch erklären
+- Mathe: Kopfrechnen/Basisteil, Trigonometrie (neu!)
+
+Heutiges Session-Feedback:
+${JSON.stringify(log, null, 2)}
+
+Heutiges Event:
+${JSON.stringify(event, null, 2)}
+
+Alle bisherigen Session-Logs (Zusammenfassung):
+${logsSummary}
+
+Kommende Events (nächste 14 Tage):
+${JSON.stringify(upcomingEvents, null, 2)}
+
+Analysiere das Feedback und antworte AUSSCHLIESSLICH als JSON:
+{
+  "einschaetzung": "2-3 aufmunternde aber ehrliche Sätze auf Deutsch",
+  "anpassungen": [
+    {
+      "event_id": "uuid des zu ändernden Events",
+      "aktion": "update",
+      "neuer_titel": "string",
+      "neuer_inhalt": "string – was genau in dieser Session gemacht werden soll",
+      "grund": "kurze Begründung auf Deutsch (1 Satz)"
+    }
+  ]
+}
+
+Regeln:
+- Maximal 3 Anpassungen vorschlagen
+- Keine Anpassungen an Prüfungstagen (isExam: true)
+- Wenn rating >= 4 UND understanding >= 4: keine Anpassungen nötig, leere anpassungen-Liste
+- Bei Schwächen: eher Wiederholungen hinzufügen (aktion: "update") als bestehende ändern
+- Antworte nur mit validem JSON`;
+
+      try {
+        const response = await callOpenRouter(prompt, config.apiKey);
+        
+        // Update log with AI response
+        const allLogs = getLogs();
+        const logIndex = allLogs.findIndex(l => l.id === log.id);
+        if (logIndex !== -1) {
+          allLogs[logIndex].aiResponse = response;
+          saveLogs(allLogs);
+        }
+        
+        hideLoadingModal();
+        
+        if (response.anpassungen && response.anpassungen.length > 0) {
+          showDiffModal(response);
+        } else {
+          alert('Die KI hat keine Anpassungen vorgeschlagen. Weiter so! 🎉\n\n' + response.einschaetzung);
+        }
+      } catch (error) {
+        hideLoadingModal();
+        alert('Fehler bei der KI-Analyse: ' + error.message);
+      }
+    }
+    
+    let currentAIResponse = null;
+    
+    function showDiffModal(response) {
+      currentAIResponse = response;
+      document.getElementById('ai-assessment-text').textContent = response.einschaetzung;
+      
+      const diffList = document.getElementById('diff-list');
+      diffList.innerHTML = response.anpassungen.map((change, i) => {
+        const event = getEventById(change.event_id);
+        return `
+          <div class="diff-item" id="diff-${i}">
+            <div class="diff-item-header">
+              <div class="diff-item-title">${event ? formatDate(event.date) + ' – ' + event.title : 'Neues Event'}</div>
+              <div class="diff-item-actions">
+                <button class="diff-action-btn accept" onclick="acceptChange(${i})" title="Akzeptieren">✓</button>
+                <button class="diff-action-btn reject" onclick="rejectChange(${i})" title="Ablehnen">✕</button>
+              </div>
+            </div>
+            <div class="diff-item-content">
+              <strong>Änderung:</strong> ${change.neuer_titel}<br>
+              ${change.neuer_inhalt}
+            </div>
+            <div class="diff-item-reason">${change.grund}</div>
+          </div>
+        `;
+      }).join('');
+      
+      openModal('diff-modal');
+    }
+    
+    function acceptChange(index) {
+      const change = currentAIResponse.anpassungen[index];
+      if (change.event_id) {
+        updateEvent(change.event_id, {
+          title: change.neuer_titel || getEventById(change.event_id).title,
+          description: change.neuer_inhalt,
+          aiAdjusted: true,
+          status: 'adjusted'
+        });
+      }
+      document.getElementById(`diff-${index}`).style.opacity = '0.5';
+      document.getElementById(`diff-${index}`).innerHTML += '<div style="text-align: center; color: var(--color-success); margin-top: var(--space-sm);">✅ Akzeptiert</div>';
+    }
+    
+    function rejectChange(index) {
+      document.getElementById(`diff-${index}`).style.opacity = '0.5';
+      document.getElementById(`diff-${index}`).innerHTML += '<div style="text-align: center; color: var(--color-error); margin-top: var(--space-sm);">❌ Abgelehnt</div>';
+    }
+    
+    function acceptAllChanges() {
+      currentAIResponse.anpassungen.forEach((_, i) => acceptChange(i));
+      setTimeout(() => {
+        closeModal('diff-modal');
+        renderDashboard();
+        renderCalendar();
+      }, 500);
+    }
+    
+    function rejectAllChanges() {
+      closeModal('diff-modal');
+    }
+
+    // ============================================
+    // DIARY
+    // ============================================
+    
+    let diaryFilter = 'all';
+    
+    function filterDiary(filter) {
+      diaryFilter = filter;
+      document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.classList.toggle('active', chip.dataset.filter === filter);
+      });
+      renderDiary();
+    }
+    
+    function renderDiary() {
+      const logs = getLogs();
+      const filteredLogs = diaryFilter === 'all' 
+        ? logs 
+        : logs.filter(l => {
+            const event = getEventById(l.eventId);
+            return event && event.subject === diaryFilter;
+          });
+      
+      const container = document.getElementById('diary-list');
+      
+      if (filteredLogs.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📓</div><p>Noch keine Sessions abgeschlossen</p></div>';
+        return;
+      }
+      
+      container.innerHTML = filteredLogs.sort((a, b) => new Date(b.date) - new Date(a.date)).map(log => {
+        const event = getEventById(log.eventId);
+        if (!event) return '';
+        
+        return `
+          <div class="diary-entry" onclick="this.classList.toggle('expanded')">
+            <div class="diary-entry-header">
+              <div class="diary-entry-indicator ${event.subject.toLowerCase()}"></div>
+              <div class="diary-entry-info">
+                <div class="diary-entry-title">${event.title}</div>
+                <div class="diary-entry-date">${formatDate(event.date)} • ${getSubjectName(event.subject)}</div>
+              </div>
+              <div class="diary-entry-ratings">
+                <div class="diary-rating">
+                  <div class="diary-rating-value">${getRatingEmoji(log.rating)}</div>
+                  <div class="diary-rating-label">Session</div>
+                </div>
+                <div class="diary-rating">
+                  <div class="diary-rating-value">${getRatingEmoji(log.understanding)}</div>
+                  <div class="diary-rating-label">Verständnis</div>
+                </div>
+              </div>
+              ${log.aiResponse ? '<span class="diary-ai-badge">🤖 KI</span>' : ''}
+            </div>
+            <div class="diary-entry-content">
+              ${log.notes ? `<div class="diary-entry-notes"><strong>Notizen:</strong><br>${log.notes}</div>` : ''}
+              ${log.aiResponse ? `<div class="ai-card" style="margin-top: var(--space-md);"><div class="ai-card-title">KI-Einschätzung</div><div class="ai-card-content">${log.aiResponse.einschaetzung}</div></div>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ============================================
+    // SETTINGS
+    // ============================================
+    
+    function loadSettings() {
+      const config = getConfig();
+      document.getElementById('settings-api-key').value = config.apiKey || '';
+      document.getElementById('theme-toggle').classList.toggle('active', config.theme === 'dark');
+    }
+    
+    function saveApiKey() {
+      const config = getConfig();
+      config.apiKey = document.getElementById('settings-api-key').value.trim();
+      saveConfig(config);
+      alert('API Key gespeichert!');
+    }
+    
+    async function testApiKeySettings() {
+      const apiKey = document.getElementById('settings-api-key').value.trim();
+      const resultDiv = document.getElementById('settings-api-test-result');
+      
+      if (!apiKey) {
+        resultDiv.innerHTML = '<div class="alert alert-error">Bitte gib einen API Key ein.</div>';
+        return;
+      }
+      
+      resultDiv.innerHTML = '<div class="loading-spinner"></div>';
+      
+      try {
+        await callOpenRouter('Antworte mit: {"status": "ok"}', apiKey);
+        resultDiv.innerHTML = '<div class="alert alert-success">✅ API Key funktioniert!</div>';
+      } catch (error) {
+        resultDiv.innerHTML = `<div class="alert alert-error">❌ Fehler: ${error.message}</div>`;
+      }
+    }
+    
+    function toggleTheme() {
+      const config = getConfig();
+      config.theme = config.theme === 'dark' ? 'light' : 'dark';
+      saveConfig(config);
+      applyTheme();
+      document.getElementById('theme-toggle').classList.toggle('active', config.theme === 'dark');
+    }
+    
+    function applyTheme() {
+      const config = getConfig();
+      document.documentElement.setAttribute('data-theme', config.theme);
+    }
+    
+    async function reparsePlan() {
+      const planText = document.getElementById('settings-plan-input').value.trim();
+      if (!planText) {
+        alert('Bitte füge einen Lernplan ein.');
+        return;
+      }
+      
+      if (!confirm('Dies wird alle bestehenden Events ersetzen. Fortfahren?')) return;
+      
+      showLoadingModal('Plan wird eingelesen...');
+      
+      try {
+        const config = getConfig();
+        const prompt = `Du bekommst einen deutschen Lernplan als Fließtext.
+Extrahiere ALLE Lerneinheiten und gib sie als JSON-Array zurück.
+
+Jedes Event-Objekt hat genau diese Felder:
+- id: generiere eine zufällige UUID
+- date: "YYYY-MM-DD"
+- startTime: "HH:MM"
+- endTime: "HH:MM"
+- subject: "DE" | "EN" | "MA" | "EXAM"
+- title: Kurztitel (max 40 Zeichen)
+- description: Detaillierter Lerninhalt
+- priority: "high" wenn ⭐ oder Endspurt, sonst "normal"
+- status: "open"
+- isExam: true nur für Prüfungstage
+- aiAdjusted: false
+- originalDescription: gleich wie description
+
+Prüfungstermine:
+- 2026-05-13: ZP10 Deutsch
+- 2026-05-19: ZP10 Englisch
+- 2026-05-28: ZP10 Mathe
+
+Antworte als: {"events": [...]}
+
+LERNPLAN:
+${planText}`;
+
+        const result = await callOpenRouter(prompt, config.apiKey);
+        saveEvents(result.events || result);
+        
+        hideLoadingModal();
+        alert('Plan erfolgreich eingelesen!');
+        document.getElementById('settings-plan-input').value = '';
+        renderDashboard();
+        renderCalendar();
+      } catch (error) {
+        hideLoadingModal();
+        alert('Fehler: ' + error.message);
+      }
+    }
+    
+    function resetEvents() {
+      if (confirm('Alle Events zurücksetzen? Dies kann nicht rückgängig gemacht werden.')) {
+        const events = getEvents();
+        events.forEach(e => {
+          if (!e.isExam) {
+            e.status = 'open';
+            e.description = e.originalDescription || e.description;
+            e.aiAdjusted = false;
+          }
+        });
+        saveEvents(events);
+        alert('Events zurückgesetzt!');
+        renderDashboard();
+        renderCalendar();
+      }
+    }
+    
+    function clearLogs() {
+      if (confirm('Alle Session-Logs löschen? Dies kann nicht rückgängig gemacht werden.')) {
+        saveLogs([]);
+        alert('Logs gelöscht!');
+        renderDiary();
+        renderDashboard();
+      }
+    }
+    
+    function toggleApiKeyVisibility(inputId) {
+      const input = document.getElementById(inputId);
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    // ============================================
+    // MODAL HELPERS
+    // ============================================
+    
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    
+    function showLoadingModal(text) {
+      document.getElementById('loading-text').textContent = text;
+      openModal('loading-modal');
+    }
+    
+    function hideLoadingModal() {
+      closeModal('loading-modal');
+    }
+    
+    // Close modals on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      });
+    });
+
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+    
+    function initApp() {
+      applyTheme();
+      renderDashboard();
+      renderCalendar();
+      renderDiary();
+      loadSettings();
+    }
+    
+    // Check if onboarding is needed
+    document.addEventListener('DOMContentLoaded', () => {
+      const config = getConfig();
+      
+      if (config.setupDone) {
+        document.getElementById('onboarding').style.display = 'none';
+        document.getElementById('app').style.display = 'flex';
+        initApp();
+      }
+    });
+  </script>
+</body>
+</html>
